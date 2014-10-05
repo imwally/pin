@@ -4,6 +4,12 @@ A simple command line pinboard client.
 
 You can add, delete, and list your bookmarks right in your terminal. Incredible.
 
+### Setup your authentication token
+
+You must first create a `.pinboard` configuration file in your home directory
+that contains your authentication token. This token can be found on the password
+tab of the settings [page](https://pinboard.in/settings/password).
+
 ### Add a bookmark
 
 The minimum requirements for a bookmark are a URL and a title. 
