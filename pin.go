@@ -24,6 +24,7 @@ var (
 	token string
 )
 
+// Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
     p.URL = *addFlag
     p.Description = *titleFlag
@@ -51,6 +52,7 @@ func Add(p pinboard.Post) {
     }
 }
 
+// Delete will delete the URL value of the -d flag.
 func Delete(p pinboard.Post) {
     p.URL = *delFlag
     p.Encode()
@@ -60,6 +62,8 @@ func Delete(p pinboard.Post) {
     }
 }
 
+// Show will list the most recent bookmarks. The -show flag indicates how many
+// bookmarks to show with a max of up to 100 bookmarks.
 func Show(p pinboard.Post) {
     if *tagFlag != "" {
         p.Tag = *tagFlag
@@ -87,6 +91,8 @@ func Show(p pinboard.Post) {
     }
 }
 
+// TokenIsSet will check to make sure an authentication token is set before
+// making an API calls.
 func TokenIsSet() bool {
     if token == "" {
         return false
