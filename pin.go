@@ -25,7 +25,7 @@ var (
 )
 
 func Add(p pinboard.Post) {
-    p.Url = *addFlag
+    p.URL = *addFlag
     p.Description = *titleFlag
 
     if *privFlag {
@@ -52,7 +52,7 @@ func Add(p pinboard.Post) {
 }
 
 func Delete(p pinboard.Post) {
-    p.Url = *delFlag
+    p.URL = *delFlag
     p.Encode()
     err := p.Delete()
     if err != nil {
