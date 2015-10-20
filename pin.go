@@ -11,11 +11,11 @@ import (
 )
 
 var (
-	addFlag    = flag.String("a", "", "url of bookmark to add")
-	delFlag    = flag.String("d", "", "url of bookmark to delete")
-	privFlag   = flag.Bool("p", false, "private bookmark")
-	readFlag   = flag.Bool("r", false, "read later bookmark")
-	extFlag    = flag.String("e", "", "longer description of bookmark")
+	addFlag    = flag.String("add", "", "url of bookmark to add")
+	delFlag    = flag.String("rm", "", "url of bookmark to delete")
+	privFlag   = flag.Bool("private", false, "private bookmark")
+	readFlag   = flag.Bool("readlater", false, "read later bookmark")
+	extFlag    = flag.String("text", "", "longer description of bookmark")
 	tagFlag    = flag.String("tag", "", "tags for bookmark")
 	longFlag   = flag.Bool("l", false, "display long format")
 	titleFlag  = flag.String("title", "", "title of the bookmark")
