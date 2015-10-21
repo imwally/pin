@@ -11,22 +11,19 @@ import (
 )
 
 var (
-	addFlag    = flag.String("add", "", "url of bookmark to add")
-	delFlag    = flag.String("rm", "", "url of bookmark to delete")
 	privFlag   = flag.Bool("private", false, "private bookmark")
 	readFlag   = flag.Bool("readlater", false, "read later bookmark")
 	extFlag    = flag.String("text", "", "longer description of bookmark")
 	tagFlag    = flag.String("tag", "", "tags for bookmark")
 	longFlag   = flag.Bool("l", false, "display long format")
 	titleFlag  = flag.String("title", "", "title of the bookmark")
-	showFlag   = flag.Int("show", 0, "show the most recent bookmarks")
 
 	token string
 )
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
-    p.URL = *addFlag
+
     p.Description = *titleFlag
 
     if *privFlag {
@@ -54,7 +51,6 @@ func Add(p pinboard.Post) {
 
 // Delete will delete the URL value of the -d flag.
 func Delete(p pinboard.Post) {
-    p.URL = *delFlag
     p.Encode()
     err := p.Delete()
     if err != nil {
@@ -69,7 +65,6 @@ func Show(p pinboard.Post) {
         p.Tag = *tagFlag
     }
 
-    p.Count = *showFlag
     p.Encode()
 
     recent := p.ShowRecent()
@@ -115,30 +110,28 @@ func init() {
 }
 
 func main() {
+	
+	if TokenIsSet() {
+		var p pinboard.Post
+		p.Token = token
 
-    if TokenIsSet() {
-        var p pinboard.Post
-        p.Token = token
+		cmd := os.Args[1]
+		
+		flag.Parse()
 
-        flag.Parse()
+		if cmd == "add" {
+			p.URL = os.Args[2]
+			Add(p)
+		}
 
-        if flag.NFlag() < 1 {
-            fmt.Fprintf(os.Stderr, "No command given.\n")
-            flag.Usage()
-            return
-        }
+		if cmd == "rm"  {
+			p.URL = os.Args[2]
+			Delete(p)
+		}
 
-        if *addFlag != "" {
-            Add(p)
-        }
-
-        if *delFlag != "" {
-            Delete(p)
-        }
-
-        if *showFlag > 0 {
-            Show(p)
-        }
-    }
+		if cmd == "ls" {
+			Show(p)
+		}
+	}
 
 }
