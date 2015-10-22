@@ -11,12 +11,13 @@ import (
 )
 
 var (
-	privFlag   = flag.Bool("private", false, "private bookmark")
-	readFlag   = flag.Bool("readlater", false, "read later bookmark")
-	extFlag    = flag.String("text", "", "longer description of bookmark")
-	tagFlag    = flag.String("tag", "", "tags for bookmark")
-	longFlag   = flag.Bool("l", false, "display long format")
-	titleFlag  = flag.String("title", "", "title of the bookmark")
+	options   = flag.NewFlagSet("", flag.ExitOnError)
+	privFlag  = options.Bool("private", false, "private bookmark")
+	readFlag  = options.Bool("readlater", false, "read later bookmark")
+	extFlag   = options.String("text", "", "longer description of bookmark")
+	tagFlag   = options.String("tag", "", "tags for bookmark")
+	longFlag  = options.Bool("l", false, "display long format")
+	titleFlag = options.String("title", "", "title of the bookmark")
 
 	token string
 )
@@ -111,27 +112,27 @@ func init() {
 
 func main() {
 	
-	if TokenIsSet() {
-		var p pinboard.Post
-		p.Token = token
-
-		cmd := os.Args[1]
-		
-		flag.Parse()
-
-		if cmd == "add" {
-			p.URL = os.Args[2]
-			Add(p)
-		}
-
-		if cmd == "rm"  {
-			p.URL = os.Args[2]
-			Delete(p)
-		}
-
-		if cmd == "ls" {
-			Show(p)
-		}
+	if !TokenIsSet() {
+		return
 	}
+	
+	var p pinboard.Post
+	p.Token = token
+	
+	flag.Parse()
+
+	if flag.NArg() < 1 {
+		fmt.Fprintf(os.Stderr, "No command is given.\n")
+	}
+	
+	cmd := flag.Arg(0)
+	
+	if cmd == "add" {
+		args := flag.Args()[2:]
+		p.URL = flag.Args()[1]
+		options.Parse(args)
+		Add(p)
+	}
+
 
 }
