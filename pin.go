@@ -134,5 +134,14 @@ func main() {
 		Add(p)
 	}
 
+	if cmd == "ls" {
+		args := flag.Args()[1:]
+		options.Parse(args)
+		Show(p)
+	}
 
+	if cmd == "rm" {
+		p.URL = flag.Args()[1]
+		Delete(p)
+	}
 }
