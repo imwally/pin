@@ -12,36 +12,35 @@ tab of the settings [page](https://pinboard.in/settings/password).
 
 ### Add a bookmark
 
-The minimum requirements for a bookmark are a URL and a title. 
+The minimum requirements to add a bookmark are a URL and a title. 
 
-`$ pin -a http://www.sweetwebsite.com -title "One Sweet Site"`
+`$ pin add http://www.sweetwebsite.com -title "One Sweet Site"`
 
 Of course you can tag your bookmark as well. Use the `-tag` flag with space
 dilimited terms.
 
-`$ pin -a http://www.sweetwebsite.com -title "One Sweet Site" -tag "sweet site
+`$ pin add http://www.sweetwebsite.com -title "One Sweet Site" -tag "sweet site
 cool"`
 
-Need even more context for your bookmark? Use the extended `-e` flag.
+Need even more context for your bookmark? Use the `-text` flag.
 
-`$ pin -a http://www.sweetwebsite.com -title "One Sweet Site" -tag "sweet site
-cool" -e "I think this is one sweet site so I'm bookmarking it."`
+`$ pin add http://www.sweetwebsite.com -title "One Sweet Site" -tag "sweet site
+cool" -text "I think this is one sweet site so I'm bookmarking it."`
 
-You can also specify the private `-p` or toread `-r` flags.
+You can also specify the private `-private` or read later `-readlater` flags.
 
 ### Delete a bookmark
 
 The only requirement to delete a bookmark is the URL.
 
-`$ pin -d http://www.sweetwebsite.com`
+`$ pin rm http://www.sweetwebsite.com`
 
 ### Show your bookmarks
 
-You can list a maximum of 100 bookmarks. The `-show` flag requires any integer
-from 1 - 100.
+You can list the most recent bookmarks.
 
-`$ pin -show 10`
+`$ pin ls`
 
 If you want more information use the long format `-l` flag.
 
-`$ pin -show 10 -l`
+`$ pin ls -l`
