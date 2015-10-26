@@ -44,3 +44,7 @@ You can list the most recent bookmarks.
 If you want more information use the long format `-l` flag.
 
 `$ pin ls -l`
+
+Bookmarks can be filtered by specifying some tags.
+
+`$ pin ls -tag "programming unix"`

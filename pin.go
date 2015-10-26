@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
-	"fmt"
+ 	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -22,7 +22,7 @@ var (
 	token string
 )
 
-// Default number of bookmarks to display
+// Default number of bookmarks to display.
 const COUNT int = 50
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
@@ -62,7 +62,8 @@ func Delete(p pinboard.Post) {
 	}
 }
 
-// Show will list the most recent bookmarks.
+// Show will list the most recent bookmarks. The -tag flag can be used
+// to filter results.
 func Show(p pinboard.Post) {
 	if *tagFlag != "" {
 		p.Tag = *tagFlag
@@ -91,7 +92,7 @@ func Show(p pinboard.Post) {
 }
 
 // TokenIsSet will check to make sure an authentication token is set before
-// making an API calls.
+// making any API calls.
 func TokenIsSet() bool {
 	if token == "" {
 		return false
@@ -115,6 +116,7 @@ func init() {
 
 func runCmd(cmds []string) {
 
+	// 
 	flag.Parse()
 	if flag.NArg() < 1 {
 		fmt.Fprintf(os.Stderr, "No command is given.\n")
