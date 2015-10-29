@@ -2,7 +2,7 @@ package main
 
 import (
 	"flag"
- 	"fmt"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -22,11 +22,23 @@ var (
 	token string
 )
 
-// Default number of bookmarks to display.
+// Number of bookmarks to display.
 const COUNT int = 50
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
+
+	// Make sure a URL is specified. add, the sub command is the
+	// first argument. The second argument is the URL being added.
+	if flag.NArg() < 2 {
+		fmt.Fprintf(os.Stderr, "Not enough arguments.\n")
+		return
+	}
+
+	// Parse flags after the URL.
+	args := flag.Args()[2:]
+	p.URL = flag.Args()[1]
+	options.Parse(args)
 
 	p.Description = *titleFlag
 
@@ -55,7 +67,17 @@ func Add(p pinboard.Post) {
 
 // Delete will delete the URL specified.
 func Delete(p pinboard.Post) {
+
+	// Make sure a URL is specified. The URL being removed is the
+	// second argument to the pin program, rm being the first.
+	if flag.NArg() < 2 {
+		fmt.Fprintf(os.Stderr, "Not enough arguments.\n")
+		return
+	}
+
+	p.URL = flag.Args()[1]
 	p.Encode()
+
 	err := p.Delete()
 	if err != nil {
 		fmt.Println(err)
@@ -65,6 +87,10 @@ func Delete(p pinboard.Post) {
 // Show will list the most recent bookmarks. The -tag flag can be used
 // to filter results.
 func Show(p pinboard.Post) {
+
+	args := flag.Args()[1:]
+	options.Parse(args)
+
 	if *tagFlag != "" {
 		p.Tag = *tagFlag
 	}
@@ -91,6 +117,50 @@ func Show(p pinboard.Post) {
 	}
 }
 
+// runCmd takes a command string, initialises a new pinboard post and
+// runs the command.
+func runCmd(cmd string) {
+	var p pinboard.Post
+	p.Token = token
+
+	if cmd == "ls" {
+		Show(p)
+	}
+
+	if cmd == "add" {
+		Add(p)
+	}
+
+	if cmd == "rm" {
+		Delete(p)
+	}
+}
+
+// start takes a slice of commands, parses flag arguments and runs the
+// command if it's found.
+func start(cmds []string) {
+	flag.Parse()
+	if flag.NArg() < 1 {
+		fmt.Fprintf(os.Stderr, "No command is given.\n")
+		return
+	}
+
+	cmdName := flag.Arg(0)
+
+	var found bool
+	for _, cmd := range cmds {
+		if cmdName == cmd {
+			runCmd(cmd)
+			return
+		}
+	}
+
+	if !found {
+		fmt.Fprintf(os.Stderr, "Command %s not found.\n", cmdName)
+		return
+	}
+}
+
 // TokenIsSet will check to make sure an authentication token is set before
 // making any API calls.
 func TokenIsSet() bool {
@@ -114,68 +184,12 @@ func init() {
 	token = string(content)
 }
 
-func runCmd(cmds []string) {
-
-	// 
-	flag.Parse()
-	if flag.NArg() < 1 {
-		fmt.Fprintf(os.Stderr, "No command is given.\n")
-		return
-	}
-
-	cmdName := flag.Arg(0)
-
-	var found bool
-	for _, cmd := range cmds {
-		if cmdName == cmd {
-			found = true
-		}
-	}
-
-	if !found {
-		fmt.Fprintf(os.Stderr, "Command %s not found.\n", cmdName)
-		return
-	}
-
-	// Initialise a post
-	var p pinboard.Post
-	p.Token = token
-
-	if cmdName == "add" {
-		if flag.NArg() < 2 {
-			fmt.Fprintf(os.Stderr, "Not enough arguments.\n")
-			return
-		}
-		args := flag.Args()[2:]
-		p.URL = flag.Args()[1]
-		options.Parse(args)
-		Add(p)
-	}
-
-	if cmdName == "ls" {
-		args := flag.Args()[1:]
-		options.Parse(args)
-		Show(p)
-	}
-
-	if cmdName == "rm" {
-		if flag.NArg() < 2 {
-			fmt.Fprintf(os.Stderr, "Not enough arguments.\n")
-			return
-		}
-		p.URL = flag.Args()[1]
-		Delete(p)
-	}
-
-}
-
 func main() {
-
 	if !TokenIsSet() {
 		return
 	}
 
-	cmds := []string{"add", "rm", "ls"}
+	cmds := []string{"help", "add", "rm", "ls"}
 
-	runCmd(cmds)
+	start(cmds)
 }
