@@ -22,6 +22,19 @@ var (
 	token string
 )
 
+var usage = `Usage: pin
+  pin rm  URL
+  pin add URL [-title title] [OPTIONS]
+  pin ls [-l] [-tag tags]
+
+Options:
+  -tag        space delimited tags 
+  -private    mark bookmark as private
+  -readlater  mark bookmark as read later
+  -text       longer description of bookmark
+  -l          long format for ls
+`
+
 // Number of bookmarks to display.
 const COUNT int = 50
 
@@ -123,6 +136,10 @@ func runCmd(cmd string) {
 	var p pinboard.Post
 	p.Token = token
 
+	if cmd == "help" {
+		fmt.Println(usage)
+	}
+	
 	if cmd == "ls" {
 		Show(p)
 	}
