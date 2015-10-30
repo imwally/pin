@@ -139,7 +139,7 @@ func runCmd(cmd string) {
 	if cmd == "help" {
 		fmt.Println(usage)
 	}
-	
+
 	if cmd == "ls" {
 		Show(p)
 	}
