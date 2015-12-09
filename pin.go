@@ -4,10 +4,12 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"net/http"
 	"os"
 	"os/user"
 
 	"github.com/imwally/pinboard"
+	"golang.org/x/net/html"
 )
 
 var (
@@ -38,6 +40,16 @@ Options:
 // Number of bookmarks to display.
 const COUNT int = 50
 
+func HTMLTitle(n *html.Node) string {
+	if n.Type == html.ElementNode && n.Data == "title" {
+		for _, a := range n.Attr {
+			return a.Val
+		}
+	}
+
+	return ""
+}
+
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
 
@@ -53,7 +65,23 @@ func Add(p pinboard.Post) {
 	p.URL = flag.Args()[1]
 	options.Parse(args)
 
-	p.Description = *titleFlag
+	if *titleFlag != "" {
+		p.Description = *titleFlag
+	} else {
+		// Grab page title
+		resp, err := http.Get(p.URL)
+		if err != nil {
+			fmt.Println(err)
+		}
+		defer resp.Body.Close()
+
+		doc, err := html.Parse(resp.Body)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		p.Description = HTMLTitle(doc)
+	}
 
 	if *privFlag {
 		p.Shared = "no"
