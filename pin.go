@@ -7,9 +7,9 @@ import (
 	"net/http"
 	"os"
 	"os/user"
+	"regexp"
 
 	"github.com/imwally/pinboard"
-	"golang.org/x/net/html"
 )
 
 var (
@@ -40,6 +40,24 @@ Options:
 // Number of bookmarks to display.
 const COUNT int = 50
 
+// PageTitle returns the title from an HTML page.
+func PageTitle(url string) (title string, err error) {
+	resp, err := http.Get(url)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+
+	re := regexp.MustCompile("<title>(.*?)</title>")
+
+	return string(re.FindSubmatch(body)[1]), nil
+}
+
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
 
@@ -55,7 +73,12 @@ func Add(p pinboard.Post) {
 	p.URL = flag.Args()[1]
 	options.Parse(args)
 
-	p.Description = *titleFlag
+	title, err := PageTitle(p.URL)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s", err)
+	} else {
+		p.Description = title
+	}
 
 	if *privFlag {
 		p.Shared = "no"
@@ -74,7 +97,7 @@ func Add(p pinboard.Post) {
 	}
 
 	p.Encode()
-	err := p.Add()
+	err = p.Add()
 	if err != nil {
 		fmt.Println(err)
 	}
