@@ -12,12 +12,18 @@ tab of the settings [page](https://pinboard.in/settings/password).
 
 ### Add a bookmark
 
-The minimum requirements to add a bookmark are a URL and a title. 
+A URL is the only requirement when adding a new pin. The title will be
+pulled from the page being pinned.
+
+`$ pin add http://www.sweetwebsite.com`
+
+If, however you prefer to add your own title you can use the `-title`
+flag.
 
 `$ pin add http://www.sweetwebsite.com -title "One Sweet Site"`
 
 Of course you can tag your bookmark as well. Use the `-tag` flag with space
-dilimited terms.
+delimited terms.
 
 `$ pin add http://www.sweetwebsite.com -title "One Sweet Site" -tag "sweet site
 cool"`
