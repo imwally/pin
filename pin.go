@@ -122,8 +122,8 @@ func Delete(p pinboard.Post) {
 	}
 }
 
-// Show will list the most recent bookmarks. The -tag flag can be used
-// to filter results.
+// Show will list the most recent bookmarks. The -tag and -readlater
+// flags can be used to filter results.
 func Show(p pinboard.Post) {
 
 	args := flag.Args()[1:]
