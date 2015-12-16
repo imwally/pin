@@ -140,11 +140,14 @@ func Show(p pinboard.Post) {
 
 	if *longFlag {
 		for _, v := range recent.Posts {
-			var shared string
+			var shared, unread string
 			if v.Shared == "no" {
-				shared = "*"
+				shared = "[*]"
 			}
-			fmt.Println(shared + v.Description)
+			if v.Toread == "yes" {
+				unread = "[#]"
+			}
+			fmt.Println(unread + shared + v.Description)
 			fmt.Println(v.Href)
 			fmt.Println(v.Tags, "\n")
 		}
