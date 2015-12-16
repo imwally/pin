@@ -132,6 +132,9 @@ func Show(p pinboard.Post) {
 	if *tagFlag != "" {
 		p.Tag = *tagFlag
 	}
+	if *readFlag {
+		p.Toread = "yes"
+	}
 
 	p.Count = COUNT
 	p.Encode()
