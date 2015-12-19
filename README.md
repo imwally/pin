@@ -4,6 +4,20 @@ A simple command line pinboard client.
 
 You can add, delete, and list your bookmarks right in your terminal. Incredible.
 
+```
+Usage: pin
+  pin rm  URL
+  pin add URL [-title title] [OPTIONS]
+  pin ls [-l] [-tag tags]
+
+Options:
+  -tag        space delimited tags 
+  -private    mark bookmark as private
+  -readlater  mark bookmark as read later
+  -text       longer description of bookmark
+  -l          long format for ls
+```
+
 ### First: Setup your authentication token
 
 Before pin is run you must first create a `.pinboard` configuration
