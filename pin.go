@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -61,16 +62,21 @@ func PageTitle(url string) (title string, err error) {
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
 
-	// Make sure a URL is specified. add, the sub command is the
-	// first argument. The second argument is the URL being added.
-	if flag.NArg() < 2 {
-		fmt.Fprintf(os.Stderr, "Not enough arguments.\n")
-		return
+	// Check stdin first.
+	read := bufio.NewReader(os.Stdin)
+	line, _, err := read.ReadLine()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if len(line) > 0 {
+		p.URL = string(line)
+	} else {
+		p.URL = flag.Args()[1]
 	}
 
 	// Parse flags after the URL.
-	args := flag.Args()[2:]
-	p.URL = flag.Args()[1]
+	args := flag.Args()[1:]
 	options.Parse(args)
 
 	title, err := PageTitle(p.URL)
