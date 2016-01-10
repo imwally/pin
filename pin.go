@@ -69,6 +69,7 @@ func Add(p pinboard.Post) {
 		fmt.Println(err)
 	}
 
+	// Use first argument if stdin is empty.
 	if len(line) > 0 {
 		p.URL = string(line)
 	} else {
@@ -112,17 +113,22 @@ func Add(p pinboard.Post) {
 // Delete will delete the URL specified.
 func Delete(p pinboard.Post) {
 
-	// Make sure a URL is specified. The URL being removed is the
-	// second argument to the pin program, rm being the first.
-	if flag.NArg() < 2 {
-		fmt.Fprintf(os.Stderr, "Not enough arguments.\n")
-		return
+	// Check stdin first.
+	read := bufio.NewReader(os.Stdin)
+	line, _, err := read.ReadLine()
+	if err != nil {
+		fmt.Println(err)
 	}
 
-	p.URL = flag.Args()[1]
-	p.Encode()
+	// Use first argument if stdin is empty.
+	if len(line) > 0 {
+		p.URL = string(line)
+	} else {
+		p.URL = flag.Args()[1]
+	}
 
-	err := p.Delete()
+	p.Encode()
+	err = p.Delete()
 	if err != nil {
 		fmt.Println(err)
 	}
