@@ -164,6 +164,9 @@ func Show(p pinboard.Post) {
 			}
 			fmt.Println(unread + shared + v.Description)
 			fmt.Println(v.Href)
+			if v.Extended != "" {
+				fmt.Println(v.Extended)
+			}
 			fmt.Println(v.Tags, "\n")
 		}
 	} else {
