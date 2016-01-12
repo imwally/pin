@@ -62,18 +62,23 @@ func PageTitle(url string) (title string, err error) {
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
 
-	// Check stdin first.
-	read := bufio.NewReader(os.Stdin)
-	line, _, err := read.ReadLine()
+	// First check for pipe.
+	fi, err := os.Stdin.Stat()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "pin: %s", err)
+		return
 	}
 
-	// Use first argument if stdin is empty.
-	if len(flag.Args()[1]) > 0 {
-		p.URL = flag.Args()[1]
-	} else {
+	isPipe := (fi.Mode() & os.ModeNamedPipe) == os.ModeNamedPipe
+	if isPipe {
+		read := bufio.NewReader(os.Stdin)
+		line, _, err := read.ReadLine()
+		if err != nil {
+			fmt.Println(err)
+		}
 		p.URL = string(line)
+	} else {
+		p.URL = flag.Args()[1]
 	}
 
 	// Parse flags after the URL.
@@ -82,7 +87,8 @@ func Add(p pinboard.Post) {
 
 	title, err := PageTitle(p.URL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "pin: couldn't get title: %s", err)
+		fmt.Fprintf(os.Stderr, "pin: couldn't get title: %s\n", err)
+		return
 	} else {
 		p.Description = title
 	}
@@ -113,15 +119,20 @@ func Add(p pinboard.Post) {
 // Delete will delete the URL specified.
 func Delete(p pinboard.Post) {
 
-	// Check stdin first.
-	read := bufio.NewReader(os.Stdin)
-	line, _, err := read.ReadLine()
+	// First check for pipe.
+	fi, err := os.Stdin.Stat()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "pin: %s", err)
+		return
 	}
 
-	// Use first argument if stdin is empty.
-	if len(line) > 0 {
+	isPipe := (fi.Mode() & os.ModeNamedPipe) == os.ModeNamedPipe
+	if isPipe {
+		read := bufio.NewReader(os.Stdin)
+		line, _, err := read.ReadLine()
+		if err != nil {
+			fmt.Println(err)
+		}
 		p.URL = string(line)
 	} else {
 		p.URL = flag.Args()[1]
