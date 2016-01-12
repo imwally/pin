@@ -70,10 +70,10 @@ func Add(p pinboard.Post) {
 	}
 
 	// Use first argument if stdin is empty.
-	if len(line) > 0 {
-		p.URL = string(line)
-	} else {
+	if len(flag.Args()[1]) > 0 {
 		p.URL = flag.Args()[1]
+	} else {
+		p.URL = string(line)
 	}
 
 	// Parse flags after the URL.
@@ -82,7 +82,7 @@ func Add(p pinboard.Post) {
 
 	title, err := PageTitle(p.URL)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s", err)
+		fmt.Fprintf(os.Stderr, "pin: couldn't get title: %s", err)
 	} else {
 		p.Description = title
 	}
@@ -204,7 +204,7 @@ func runCmd(cmd string) {
 func start(cmds []string) {
 	flag.Parse()
 	if flag.NArg() < 1 {
-		fmt.Fprintf(os.Stderr, "No command is given.\n")
+		fmt.Fprintf(os.Stderr, "pin: no command is given.\n")
 		return
 	}
 
@@ -219,7 +219,7 @@ func start(cmds []string) {
 	}
 
 	if !found {
-		fmt.Fprintf(os.Stderr, "Command %s not found.\n", cmdName)
+		fmt.Fprintf(os.Stderr, "pin: command %s not found.\n", cmdName)
 		return
 	}
 }
