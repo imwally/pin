@@ -8,7 +8,7 @@ You can add, delete, and list your bookmarks right in your terminal. Incredible.
 Usage: pin
   pin rm  URL
   pin add URL [-title title] [OPTIONS]
-  pin ls [-l] [-tag tags]
+  pin ls [OPTIONS]
 
 Options:
   -tag        space delimited tags 
