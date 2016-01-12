@@ -28,7 +28,7 @@ var (
 var usage = `Usage: pin
   pin rm  URL
   pin add URL [-title title] [OPTIONS]
-  pin ls [-l] [-tag tags]
+  pin ls [OPTIONS]
 
 Options:
   -tag        space delimited tags 
@@ -183,7 +183,7 @@ func runCmd(cmd string) {
 	p.Token = token
 
 	if cmd == "help" {
-		fmt.Println(usage)
+		fmt.Printf("%s", usage)
 	}
 
 	if cmd == "ls" {
