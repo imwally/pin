@@ -41,6 +41,28 @@ Options:
 // Number of bookmarks to display.
 const COUNT int = 50
 
+// Piped is a helper function to check for piped input. It will return
+// input, true if data was piped.
+func Piped() (string, bool) {
+	fi, err := os.Stdin.Stat()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "pin: %s", err)
+		return "", false
+	}
+
+	isPipe := (fi.Mode() & os.ModeNamedPipe) == os.ModeNamedPipe
+	if isPipe {
+		read := bufio.NewReader(os.Stdin)
+		line, _, err := read.ReadLine()
+		if err != nil {
+			fmt.Println(err)
+		}
+		return string(line), true
+	}
+	
+	return "", false
+}
+
 // PageTitle returns the title from an HTML page.
 func PageTitle(url string) (title string, err error) {
 	resp, err := http.Get(url)
@@ -62,25 +84,13 @@ func PageTitle(url string) (title string, err error) {
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
 
-	// First check for pipe.
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "pin: %s", err)
-		return
-	}
-
-	isPipe := (fi.Mode() & os.ModeNamedPipe) == os.ModeNamedPipe
-	if isPipe {
-		read := bufio.NewReader(os.Stdin)
-		line, _, err := read.ReadLine()
-		if err != nil {
-			fmt.Println(err)
-		}
-		p.URL = string(line)
+	// Check if URL is piped in or first argument.
+	if url, ok := Piped(); ok {
+		p.URL = url
 	} else {
 		p.URL = flag.Args()[1]
 	}
-
+	
 	// Parse flags after the URL.
 	args := flag.Args()[1:]
 	options.Parse(args)
@@ -118,28 +128,16 @@ func Add(p pinboard.Post) {
 
 // Delete will delete the URL specified.
 func Delete(p pinboard.Post) {
-
-	// First check for pipe.
-	fi, err := os.Stdin.Stat()
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "pin: %s", err)
-		return
-	}
-
-	isPipe := (fi.Mode() & os.ModeNamedPipe) == os.ModeNamedPipe
-	if isPipe {
-		read := bufio.NewReader(os.Stdin)
-		line, _, err := read.ReadLine()
-		if err != nil {
-			fmt.Println(err)
-		}
-		p.URL = string(line)
+	
+	// Check if URL is piped in or first argument.
+	if url, ok := Piped(); ok {
+		p.URL = url
 	} else {
 		p.URL = flag.Args()[1]
 	}
 
 	p.Encode()
-	err = p.Delete()
+	err := p.Delete()
 	if err != nil {
 		fmt.Println(err)
 	}
