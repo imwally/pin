@@ -63,6 +63,13 @@ The only requirement to delete a bookmark is the URL.
 
 `$ pin rm http://www.sweetwebsite.com`
 
+If you made a mistake or changed your mind about a recent bookmark you
+can quickly remove the last bookmark added with the help of pipes
+(thanks, [https://en.wikipedia.org/wiki/Douglas_McIlroy](Douglas
+McIlroy)).
+
+`$ pin ls | head -1 | pin rm`
+
 ### Show your bookmarks
 
 You can list the most recent bookmarks.
