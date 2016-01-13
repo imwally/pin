@@ -65,8 +65,8 @@ The only requirement to delete a bookmark is the URL.
 
 If you made a mistake or changed your mind about a recent bookmark you
 can quickly remove the last bookmark added with the help of pipes
-(thanks, [https://en.wikipedia.org/wiki/Douglas_McIlroy](Douglas
-McIlroy)).
+(thanks,
+[Douglas McIlroy](https://en.wikipedia.org/wiki/Douglas_McIlroy)).
 
 `$ pin ls | head -1 | pin rm`
 
