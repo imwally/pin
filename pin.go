@@ -17,9 +17,9 @@ var (
 	options   = flag.NewFlagSet("", flag.ExitOnError)
 	privFlag  = options.Bool("private", false, "private bookmark")
 	readFlag  = options.Bool("readlater", false, "read later bookmark")
+	longFlag  = options.Bool("l", false, "display long format")
 	extFlag   = options.String("text", "", "longer description of bookmark")
 	tagFlag   = options.String("tag", "", "tags for bookmark")
-	longFlag  = options.Bool("l", false, "display long format")
 	titleFlag = options.String("title", "", "title of the bookmark")
 
 	token string
@@ -83,16 +83,20 @@ func PageTitle(url string) (title string, err error) {
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
-
-	// Check if URL is piped in or first argument.
+	
+	var args []string
+	
+	// Check if URL is piped in or first argument. Optional tags
+	// should follow the URL.
 	if url, ok := Piped(); ok {
 		p.URL = url
+		args = flag.Args()[1:]
 	} else {
 		p.URL = flag.Args()[1]
+		args = flag.Args()[2:]
 	}
-	
+
 	// Parse flags after the URL.
-	args := flag.Args()[1:]
 	options.Parse(args)
 
 	title, err := PageTitle(p.URL)
@@ -111,14 +115,9 @@ func Add(p pinboard.Post) {
 		p.Toread = "yes"
 	}
 
-	if *extFlag != "" {
-		p.Extended = *extFlag
-	}
-
-	if *tagFlag != "" {
-		p.Tags = *tagFlag
-	}
-
+	p.Extended = *extFlag
+	p.Tags = *tagFlag
+	
 	p.Encode()
 	err = p.Add()
 	if err != nil {
