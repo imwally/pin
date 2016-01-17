@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"html"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -59,7 +60,7 @@ func Piped() (string, bool) {
 		}
 		return string(line), true
 	}
-	
+
 	return "", false
 }
 
@@ -78,14 +79,14 @@ func PageTitle(url string) (title string, err error) {
 
 	re := regexp.MustCompile("<title>(.*?)</title>")
 
-	return string(re.FindSubmatch(body)[1]), nil
+	return html.UnescapeString(string(re.FindSubmatch(body)[1])), nil
 }
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
-	
+
 	var args []string
-	
+
 	// Check if URL is piped in or first argument. Optional tags
 	// should follow the URL.
 	if url, ok := Piped(); ok {
@@ -117,7 +118,7 @@ func Add(p pinboard.Post) {
 
 	p.Extended = *extFlag
 	p.Tags = *tagFlag
-	
+
 	p.Encode()
 	err = p.Add()
 	if err != nil {
@@ -127,7 +128,7 @@ func Add(p pinboard.Post) {
 
 // Delete will delete the URL specified.
 func Delete(p pinboard.Post) {
-	
+
 	// Check if URL is piped in or first argument.
 	if url, ok := Piped(); ok {
 		p.URL = url
