@@ -100,12 +100,17 @@ func Add(p pinboard.Post) {
 	// Parse flags after the URL.
 	options.Parse(args)
 
-	title, err := PageTitle(p.URL)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "pin: couldn't get title: %s\n", err)
-		return
+	if *titleFlag != "" {
+		p.Description = *titleFlag
 	} else {
-		p.Description = title
+		// Use page title if title flag is not supplied.
+		title, err := PageTitle(p.URL)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "pin: couldn't get title: %s\n", err)
+			return
+		} else {
+			p.Description = title
+		}
 	}
 
 	if *privFlag {
@@ -120,7 +125,7 @@ func Add(p pinboard.Post) {
 	p.Tags = *tagFlag
 
 	p.Encode()
-	err = p.Add()
+	err := p.Add()
 	if err != nil {
 		fmt.Println(err)
 	}
