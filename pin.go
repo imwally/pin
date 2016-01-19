@@ -28,10 +28,11 @@ var (
 
 var usage = `Usage: pin
   pin rm  URL
-  pin add URL [-title title] [OPTIONS]
-  pin ls [OPTIONS]
+  pin add URL [OPTION]
+  pin ls [OPTION]
 
 Options:
+  -title      title of bookmark being added
   -tag        space delimited tags 
   -private    mark bookmark as private
   -readlater  mark bookmark as read later
