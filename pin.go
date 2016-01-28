@@ -40,7 +40,7 @@ Options:
   -l          long format for ls
 `
 
-// Number of bookmarks to display.
+// COUNT is the number of bookmarks to display.
 const COUNT int = 50
 
 // Piped is a helper function to check for piped input. It will return
@@ -109,9 +109,9 @@ func Add(p pinboard.Post) {
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "pin: couldn't get title: %s\n", err)
 			return
-		} else {
-			p.Description = title
 		}
+
+		p.Description = title
 	}
 
 	if *privFlag {
