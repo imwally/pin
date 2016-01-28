@@ -10,6 +10,7 @@ import (
 	"os"
 	"os/user"
 	"regexp"
+	"strings"
 
 	"github.com/imwally/pinboard"
 )
@@ -78,9 +79,11 @@ func PageTitle(url string) (title string, err error) {
 		return "", err
 	}
 
-	re := regexp.MustCompile("<title>(.*?)</title>")
+	re := regexp.MustCompile("<title>(?s)(.*?)(?s)</title>")
+	t := string(re.FindSubmatch(body)[1])
+	t = strings.TrimSpace(t)
 
-	return html.UnescapeString(string(re.FindSubmatch(body)[1])), nil
+	return html.UnescapeString(t), nil
 }
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
