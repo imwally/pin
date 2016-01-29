@@ -88,7 +88,6 @@ func PageTitle(url string) (title string, err error) {
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
 func Add(p pinboard.Post) {
-
 	var args []string
 
 	// Check if URL is piped in or first argument. Optional tags
@@ -110,7 +109,7 @@ func Add(p pinboard.Post) {
 		// Use page title if title flag is not supplied.
 		title, err := PageTitle(p.URL)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "pin: couldn't get title: %s\n", err)
+			fmt.Fprintf(os.Stderr, "pin: couldn't get page title: %s\n", err)
 			return
 		}
 
@@ -128,7 +127,6 @@ func Add(p pinboard.Post) {
 	p.Extended = *extFlag
 	p.Tags = *tagFlag
 
-	p.Encode()
 	err := p.Add()
 	if err != nil {
 		fmt.Println(err)
@@ -137,7 +135,6 @@ func Add(p pinboard.Post) {
 
 // Delete will delete the URL specified.
 func Delete(p pinboard.Post) {
-
 	// Check if URL is piped in or first argument.
 	if url, ok := Piped(); ok {
 		p.URL = url
@@ -145,7 +142,6 @@ func Delete(p pinboard.Post) {
 		p.URL = flag.Args()[1]
 	}
 
-	p.Encode()
 	err := p.Delete()
 	if err != nil {
 		fmt.Println(err)
@@ -155,7 +151,6 @@ func Delete(p pinboard.Post) {
 // Show will list the most recent bookmarks. The -tag and -readlater
 // flags can be used to filter results.
 func Show(p pinboard.Post) {
-
 	args := flag.Args()[1:]
 	options.Parse(args)
 
@@ -167,12 +162,11 @@ func Show(p pinboard.Post) {
 	}
 
 	p.Count = COUNT
-	p.Encode()
 
 	recent := p.ShowRecent()
 
-	if *longFlag {
-		for _, v := range recent.Posts {
+	for _, v := range recent.Posts {
+		if *longFlag {
 			var shared, unread string
 			if v.Shared == "no" {
 				shared = "[*]"
@@ -186,9 +180,7 @@ func Show(p pinboard.Post) {
 				fmt.Println(v.Extended)
 			}
 			fmt.Println(v.Tags, "\n")
-		}
-	} else {
-		for _, v := range recent.Posts {
+		} else {
 			fmt.Println(v.Href)
 		}
 	}
