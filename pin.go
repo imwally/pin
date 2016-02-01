@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"html"
@@ -21,7 +22,7 @@ var (
 	readFlag  = options.Bool("readlater", false, "read later bookmark")
 	longFlag  = options.Bool("l", false, "display long format")
 	extFlag   = options.String("text", "", "longer description of bookmark")
-	tagFlag   = options.String("tag", "", "tags for bookmark")
+	tagFlag   = options.String("tag", "", "space delimited tags for bookmark")
 	titleFlag = options.String("title", "", "title of the bookmark")
 
 	token string
@@ -67,7 +68,8 @@ func Piped() (string, bool) {
 	return "", false
 }
 
-// PageTitle returns the title from an HTML page.
+// PageTitle attempts to parse an HTML document for the <title> tag
+// using the regexp package.
 func PageTitle(url string) (title string, err error) {
 	resp, err := http.Get(url)
 	if err != nil {
@@ -80,15 +82,24 @@ func PageTitle(url string) (title string, err error) {
 		return "", err
 	}
 
+	// A regular expression that searches for any characters or
+	// new lines within the bounds of <title> and </title>.
 	re := regexp.MustCompile("<title>(?s)(.*?)(?s)</title>")
 	t := string(re.FindSubmatch(body)[1])
+
+	// If no title is found, return an error.
+	if len(t) < 1 {
+		return "", errors.New("pin: couldn't get page title")
+	}
+
+	// Trim new lines and white spaces from title.
 	t = strings.TrimSpace(t)
 
 	return html.UnescapeString(t), nil
 }
 
 // Add checks flag values and encodes the GET URL for adding a bookmark.
-func Add(p pinboard.Post) {
+func Add(p *pinboard.Post) {
 	var args []string
 
 	// Check if URL is piped in or first argument. Optional tags
@@ -110,7 +121,7 @@ func Add(p pinboard.Post) {
 		// Use page title if title flag is not supplied.
 		title, err := PageTitle(p.URL)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "pin: couldn't get page title: %s\n", err)
+			fmt.Fprintf(os.Stderr, "pin: %s: %s\n", err, p.URL)
 			return
 		}
 
@@ -135,7 +146,7 @@ func Add(p pinboard.Post) {
 }
 
 // Delete will delete the URL specified.
-func Delete(p pinboard.Post) {
+func Delete(p *pinboard.Post) {
 	// Check if URL is piped in or first argument.
 	if url, ok := Piped(); ok {
 		p.URL = url
@@ -151,7 +162,7 @@ func Delete(p pinboard.Post) {
 
 // Show will list the most recent bookmarks. The -tag and -readlater
 // flags can be used to filter results.
-func Show(p pinboard.Post) {
+func Show(p *pinboard.Post) {
 	args := flag.Args()[1:]
 	options.Parse(args)
 
@@ -165,7 +176,6 @@ func Show(p pinboard.Post) {
 	p.Count = COUNT
 
 	recent := p.ShowRecent()
-
 	for _, v := range recent.Posts {
 		if *longFlag {
 			var shared, unread string
@@ -187,32 +197,14 @@ func Show(p pinboard.Post) {
 	}
 }
 
-// runCmd takes a command string, initialises a new pinboard post and
-// runs the command.
-func runCmd(cmd string) {
-	var p pinboard.Post
-	p.Token = token
-
-	if cmd == "help" {
-		fmt.Printf("%s", usage)
-	}
-
-	if cmd == "ls" {
-		Show(p)
-	}
-
-	if cmd == "add" {
-		Add(p)
-	}
-
-	if cmd == "rm" {
-		Delete(p)
-	}
+// Help prints pin's usage text.
+func Help(p *pinboard.Post) {
+	fmt.Printf("%s", usage)
 }
 
 // start takes a slice of commands, parses flag arguments and runs the
 // command if it's found.
-func start(cmds []string) {
+func Start(cmds map[string]func(p *pinboard.Post)) {
 	flag.Parse()
 	if flag.NArg() < 1 {
 		fmt.Fprintf(os.Stderr, "pin: no command is given.\n")
@@ -221,27 +213,23 @@ func start(cmds []string) {
 
 	cmdName := flag.Arg(0)
 
-	var found bool
-	for _, cmd := range cmds {
-		if cmdName == cmd {
-			runCmd(cmd)
-			return
-		}
-	}
-
-	if !found {
+	cmd, ok := cmds[cmdName]
+	if !ok {
 		fmt.Fprintf(os.Stderr, "pin: command %s not found.\n", cmdName)
 		return
 	}
+
+	// Initialise a new Pinboard post and token.
+	p := new(pinboard.Post)
+	p.Token = token
+
+	cmd(p)
 }
 
 // TokenIsSet will check to make sure an authentication token is set before
 // making any API calls.
 func TokenIsSet() bool {
-	if token == "" {
-		return false
-	}
-	return true
+	return token != ""
 }
 
 func init() {
@@ -263,7 +251,12 @@ func main() {
 		return
 	}
 
-	cmds := []string{"help", "add", "rm", "ls"}
+	cmds := map[string]func(*pinboard.Post){
+		"help": Help,
+		"add":  Add,
+		"rm":   Delete,
+		"ls":   Show,
+	}
 
-	start(cmds)
+	Start(cmds)
 }
