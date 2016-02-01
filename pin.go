@@ -58,7 +58,8 @@ func Piped() (string, bool) {
 		read := bufio.NewReader(os.Stdin)
 		line, _, err := read.ReadLine()
 		if err != nil {
-			fmt.Println(err)
+			fmt.Fprintf(os.Stderr, "pin: %s", err)
+			return "", false
 		}
 		return string(line), true
 	}
@@ -129,7 +130,7 @@ func Add(p pinboard.Post) {
 
 	err := p.Add()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "pin: %s\n", err)
 	}
 }
 
@@ -144,7 +145,7 @@ func Delete(p pinboard.Post) {
 
 	err := p.Delete()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "pin: %s\n", err)
 	}
 }
 
@@ -246,12 +247,12 @@ func TokenIsSet() bool {
 func init() {
 	u, err := user.Current()
 	if err != nil {
-		fmt.Println(err)
+		fmt.Fprintf(os.Stderr, "pin: %s", err)
 	}
 
 	content, err := ioutil.ReadFile(u.HomeDir + "/.pinboard")
 	if err != nil {
-		fmt.Println("No authorization token found. Please add your authorization token to ~/.pinboard")
+		fmt.Fprintf(os.Stderr, "pin: No authorization token found. Please add your authorization token to ~/.pinboard\n")
 	}
 
 	token = string(content)
