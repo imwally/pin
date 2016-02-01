@@ -202,8 +202,9 @@ func Help(p *pinboard.Post) {
 	fmt.Printf("%s", usage)
 }
 
-// start takes a slice of commands, parses flag arguments and runs the
-// command if it's found.
+// Start takes a map of command names to functions, parses flag
+// arguments, initialises a new pinboard.Post and runs the command if
+// found.
 func Start(cmds map[string]func(p *pinboard.Post)) {
 	flag.Parse()
 	if flag.NArg() < 1 {
