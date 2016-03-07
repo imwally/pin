@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"flag"
 	"fmt"
 	"html"
@@ -69,8 +68,21 @@ func Piped() (string, bool) {
 }
 
 // PageTitle attempts to parse an HTML document for the <title> tag
-// using the regexp package.
+// using the regexp package. If no title is found then the url itself
+// is returned as the title.
 func PageTitle(url string) (title string, err error) {
+	// Check first to see if this is an HTML document.
+	head, err := http.Head(url)
+	if err != nil {
+		return "", err
+	}
+
+	// This is not an HTML document, using URL as title.
+	if !strings.Contains(head.Header["Content-Type"][0], "text/html") {
+		return url, nil
+	}
+
+	// Carry on getting the HTML document.
 	resp, err := http.Get(url)
 	if err != nil {
 		return "", err
@@ -87,9 +99,9 @@ func PageTitle(url string) (title string, err error) {
 	re := regexp.MustCompile("<title>(?s)(.*?)(?s)</title>")
 	t := string(re.FindSubmatch(body)[1])
 
-	// If no title is found, return an error.
+	// No title found, using URL as title.
 	if len(t) < 1 {
-		return "", errors.New("pin: couldn't get page title")
+		return url, nil
 	}
 
 	// Trim new lines and white spaces from title.
