@@ -21,6 +21,7 @@ func TestGetPageTitle(t *testing.T) {
 		"https://github.com/imwally/pin/blob/master/pin.go",
 		"https://amazon.com",
 		//"https://laskdjflajlhgalkghalgkl.com",
+		"http://www.cs.umd.edu/~waa/414-F11/IntroToCrypto.pdf",
 	}
 
 	for _, url := range urls {
