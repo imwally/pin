@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"flag"
 	"fmt"
 	"html"
@@ -225,45 +226,49 @@ func Start(cmds map[string]func(p *pinboard.Post)) {
 	}
 
 	cmdName := flag.Arg(0)
-
 	cmd, ok := cmds[cmdName]
 	if !ok {
 		fmt.Fprintf(os.Stderr, "pin: command %s not found.\n", cmdName)
 		return
 	}
 
-	// Initialise a new Pinboard post and token.
+	// Display help without creating a new Post or setting the user's
+	// token.
+	if cmdName == "help" {
+		cmd(nil)
+		return
+	}
+
+	// Initialise a new Pinboard post.
 	p := new(pinboard.Post)
+
+	// Check and set user's token.
+	token, err := GetToken()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, err.Error())
+		return
+	}
 	p.Token = token
 
 	cmd(p)
 }
 
-// TokenIsSet will check to make sure an authentication token is set before
-// making any API calls.
-func TokenIsSet() bool {
-	return token != ""
-}
-
-func init() {
+// GetToken attempts to read a user's token from ~/.pinboard.
+func GetToken() (string, error) {
 	u, err := user.Current()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "pin: %s", err)
+		return "", err
 	}
 
 	content, err := ioutil.ReadFile(u.HomeDir + "/.pinboard")
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "pin: No authorization token found. Please add your authorization token to ~/.pinboard\n")
+		return "", errors.New("pin: No authorization token found. Please add your authorization token to ~/.pinboard\n")
 	}
 
-	token = string(content)
+	return string(content), nil
 }
 
 func main() {
-	if !TokenIsSet() {
-		return
-	}
-
 	cmds := map[string]func(*pinboard.Post){
 		"help": Help,
 		"add":  Add,
