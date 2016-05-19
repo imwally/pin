@@ -117,10 +117,20 @@ func Add(p *pinboard.Post) {
 
 	// Check if URL is piped in or first argument. Optional tags
 	// should follow the URL.
-	if url, ok := Piped(); ok {
+	url, piped := Piped()
+
+	if piped {
 		p.URL = url
 		args = flag.Args()[1:]
-	} else {
+	}
+
+	if !piped {
+		// Check length of arguments.
+		err := CheckArgs(flag.Args())
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return
+		}
 		p.URL = flag.Args()[1]
 		args = flag.Args()[2:]
 	}
@@ -161,9 +171,19 @@ func Add(p *pinboard.Post) {
 // Delete will delete the URL specified.
 func Delete(p *pinboard.Post) {
 	// Check if URL is piped in or first argument.
-	if url, ok := Piped(); ok {
+	url, piped := Piped()
+
+	if piped {
 		p.URL = url
-	} else {
+	}
+
+	if !piped {
+		// Check length of arguments.
+		err := CheckArgs(flag.Args())
+		if err != nil {
+			fmt.Fprintf(os.Stderr, err.Error())
+			return
+		}
 		p.URL = flag.Args()[1]
 	}
 
@@ -251,6 +271,15 @@ func Start(cmds map[string]func(p *pinboard.Post)) {
 	p.Token = token
 
 	cmd(p)
+}
+
+// CheckArgs makes sure enough arguments are given to sub commands.
+func CheckArgs(args []string) error {
+	if len(args) < 2 {
+		return errors.New("pin: not enough arguments given.\n")
+	}
+
+	return nil
 }
 
 // GetToken attempts to read a user's token from ~/.pinboard.
