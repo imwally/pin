@@ -211,19 +211,21 @@ func Show(p *pinboard.Post) {
 	recent := p.ShowRecent()
 	for _, v := range recent.Posts {
 		if *longFlag {
-			var shared, unread string
 			if v.Shared == "no" {
-				shared = "[*]"
+				fmt.Printf("[*]")
 			}
 			if v.Toread == "yes" {
-				unread = "[#]"
+				fmt.Printf("[#]")
 			}
-			fmt.Println(unread + shared + v.Description)
+			fmt.Println(v.Description)
 			fmt.Println(v.Href)
 			if v.Extended != "" {
 				fmt.Println(v.Extended)
 			}
-			fmt.Println(v.Tags, "\n")
+			if v.Tags != "" {
+				fmt.Println(v.Tags)
+			}
+			fmt.Println()
 		} else {
 			fmt.Println(v.Href)
 		}
