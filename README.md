@@ -19,6 +19,10 @@ Options:
   -l          long format for ls
 ```
 
+### Install
+
+`go get -u github.com/imwally/pin`
+
 ### First: Setup your authentication token
 
 Before pin is run you must first create a `.pinboard` configuration
