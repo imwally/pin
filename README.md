@@ -55,8 +55,10 @@ cool"`
 
 Need even more context for your bookmark? Use the `-text` flag.
 
-`$ pin add http://www.sweetwebsite.com -title "One Sweet Site" -tag "sweet site
-cool" -text "I think this is one sweet site so I'm bookmarking it."`
+    $ pin add http://www.sweetwebsite.com -title "One Sweet Site" \
+    -tag "sweet site cool" \
+    -text "I think this is one sweet site so I'm bookmarking it."
+
 
 ### More Options
 
