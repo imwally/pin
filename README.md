@@ -25,7 +25,7 @@ Options:
 
 ### First: Setup your authentication token
 
-Before pin is run you must first create a `.pinboard` configuration
+Before running `pin` you must first create a `.pinboard` configuration
 file in your home directory that contains your authentication
 token. This token can be found on the password tab of the settings
 [page](https://pinboard.in/settings/password).
