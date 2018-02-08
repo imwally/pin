@@ -98,15 +98,15 @@ func PageTitle(url string) (title string, err error) {
 	// A regular expression that searches for any characters or
 	// new lines within the bounds of <title> and </title>.
 	re := regexp.MustCompile("<title>(?s)(.*?)(?s)</title>")
-	t := string(re.FindSubmatch(body)[1])
+	match := re.FindSubmatch(body)
 
 	// No title found, using URL as title.
-	if len(t) < 1 {
+	if len(match) < 1 {
 		return url, nil
 	}
 
 	// Trim new lines and white spaces from title.
-	t = strings.TrimSpace(t)
+	t := strings.TrimSpace(string(match[1]))
 
 	return html.UnescapeString(t), nil
 }
