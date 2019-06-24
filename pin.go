@@ -209,7 +209,7 @@ func Show(p *pinboard.Post) {
 	p.Count = COUNT
 
 	recent := p.ShowRecent()
-	for _, v := range recent.Posts {
+	for i, v := range recent.Posts {
 		if *longFlag {
 			if v.Shared == "no" {
 				fmt.Printf("[*]")
@@ -225,7 +225,9 @@ func Show(p *pinboard.Post) {
 			if v.Tags != "" {
 				fmt.Println(v.Tags)
 			}
-			fmt.Println()
+			if i != len(recent.Posts)-1 {
+				fmt.Println()
+			}
 		} else {
 			fmt.Println(v.Href)
 		}
